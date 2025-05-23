@@ -1,9 +1,9 @@
 output "public_ip" {
-  description = "La IP pública de la instancia EC2"
+  description = "Public IP address of the EC2 instance"
   value       = aws_instance.web_server.public_ip
 }
 
 output "public_dns" {
-  description = "El DNS público de la instancia EC2"
+  description = "Public DNS name of the EC2 instance"
   value       = aws_instance.web_server.public_dns
 }

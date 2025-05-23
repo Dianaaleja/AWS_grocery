@@ -13,7 +13,7 @@ variable "instance_type" {
 variable "key_pair_name" {
   description = "Name of the existing AWS Key Pair"
   type        = string
-  default     = "jonas"  # Keep this only if it matches a real key pair name in your AWS Console
+  default     = "dianis"  # o tambien puedo usar EC2 Tutorial
 }
 
 variable "aws_region" {
@@ -25,12 +25,12 @@ variable "aws_region" {
 variable "profile" {
   description = "AWS named CLI profile"
   type        = string
-  default     = "default"  # Basado en el paso 8
+  default     = "AdministratorAccess-069865454777"
 }
 
 variable "ami" {
   description = "AMI ID to use for the EC2 instance"
   type        = string
-  # Amazon Linux 2 para eu-central-1 (puedes cambiarlo si usas otra imagen)
-  default     = "ami-0c02fb55956c7d316"
+  # Amazon Linux 2023 para eu-central-1 (Frankfurt)
+  default     = "ami-02b7d5b1e55a7b5f1"
 }

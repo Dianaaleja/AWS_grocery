@@ -19,6 +19,11 @@ data "aws_subnet" "default" {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
+
+  filter {
+    name   = "availability-zone"
+    values = ["eu-central-1a"]
+  }
 }
 
 # Crear Security Group
@@ -64,6 +69,10 @@ resource "aws_instance" "web_server" {
   vpc_security_group_ids      = [aws_security_group.web_sg.id]
   associate_public_ip_address = true
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tags = {
     Name = var.instance_name
   }
@@ -71,9 +80,18 @@ resource "aws_instance" "web_server" {
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
+
+              # Instalar Apache
               yum install -y httpd
               systemctl start httpd
               systemctl enable httpd
               echo "Hello, World from ${var.instance_name}!" > /var/www/html/index.html
+
+              # Instalar Docker
+              yum install -y docker
+              systemctl start docker
+              systemctl enable docker
+              usermod -aG docker ec2-user
               EOF
 }
+
