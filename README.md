@@ -1,161 +1,129 @@
-# GroceryMate
+# 🛒 AWS Grocery App Deployment Guide using Terraform
 
-## 🏆 GroceryMate E-Commerce Platform
+Welcome! This repository contains the infrastructure deployment guide for **GroceryMate**, a cloud-native e-commerce platform for online grocery shopping.  
+Built as part of the **Masterschool Data Science Bootcamp** — Cloud Engineering Track.
 
-[![Python](https://img.shields.io/badge/Language-Python%2C%20JavaScript-blue)](https://www.python.org/)
-[![OS](https://img.shields.io/badge/OS-Linux%2C%20Windows%2C%20macOS-green)](https://www.kernel.org/)
-[![Database](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
-[![GitHub Release](https://img.shields.io/github/v/release/AlejandroRomanIbanez/AWS_grocery)](https://github.com/AlejandroRomanIbanez/AWS_grocery/releases/tag/v2.0.0)
-[![Free](https://img.shields.io/badge/Free_for_Non_Commercial_Use-brightgreen)](#-license)
-
-⭐ **Star us on GitHub** — it motivates us a lot!
+Our goal: **Fully automated AWS infrastructure deployment** using **Terraform** and **GitHub Actions**.
 
 ---
 
-## 📌 Table of Contents
+## 📚 Table of Contents
+1. 🚀 [Introduction](#-introduction)
+2. 🏗️ [Infrastructure Overview](#-infrastructure-overview)
+3. 🧩 [Architecture & Diagrams](#-architecture--diagrams)
+4. ⚙️ [Terraform Configuration](#-terraform-configuration)
+5. 🏢 [Infrastructure Components](#-infrastructure-components)
+    - 🔒 [Security Groups](#-security-groups)
+    - ☁️ [Virtual Private Cloud (VPC)](#-virtual-private-cloud-vpc)
+    - 🌐 [Application Load Balancer (ALB)](#-application-load-balancer-alb)
+    - 🖥️ [Compute Infrastructure (EC2 & Auto Scaling Group)](#-compute-infrastructure-ec2--auto-scaling-group)
+    - 📦 [Container Registry (ECR)](#-container-registry-ecr)
+    - 🛢️ [Database (Amazon RDS - PostgreSQL)](#-database-amazon-rds---postgresql)
+    - 🗄️ [Storage (S3 Bucket)](#-storage-s3-bucket)
+    - 🛡️ [IAM Roles & Policies](#-iam-roles--policies)
+    - 🔄 [Lambda Function & Step Functions](#-lambda-function--step-functions)
+6. 🧮 [Variables](#-variables)
+7. 🛠️ [Terraform Execution Flow](#-terraform-execution-flow)
+8. 📝 [Notes](#-notes)
+9. 🤝 [Contributing](#-contributing)
+10. 📜 [License](#-license)
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [Screenshots & Demo](#-screenshots--demo)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-  - [Clone Repository](#-clone-repository)
-  - [Configure PostgreSQL](#-configure-postgresql)
-  - [Populate Database](#-populate-database)
-  - [Set Up Python Environment](#-set-up-python-environment)
-  - [Set Environment Variables](#-set-environment-variables)
-  - [Start the Application](#-start-the-application)
-- [Usage](#-usage)
-- [Contributing](#-contributing)
-- [License](#-license)
+---
 
-## 🚀 Overview
+## 🚀 Introduction
 
-GroceryMate is an application developed as part of the Masterschools program by **Alejandro Roman Ibanez**. It is a modern, full-featured e-commerce platform designed for seamless online grocery shopping. It provides an intuitive user interface and a secure backend, allowing users to browse products, manage their shopping basket, and complete purchases efficiently.
+**GroceryMate** is a cloud-native e-commerce app built for a seamless online grocery experience.
+This project, developed as part of the **Cloud Track Engineering** in Masterschool’s **Data Science Bootcamp**, extends an original app by our mentor **Alejandro Román** — special thanks!
 
-GroceryMate is a modern, full-featured e-commerce platform designed for seamless online grocery shopping. It provides an intuitive user interface and a secure backend, allowing users to browse products, manage their shopping basket, and complete purchases efficiently.
+**The challenge:** deploy its AWS infrastructure, step-by-step.
+**The solution:** full automation with Terraform and GitHub Actions — scalable, repeatable, and 100% hands-off.
 
-## 🛒 Features
+This repository focuses on the AWS architecture, deployment pipeline, and automation.
+For application features and local setup instructions, refer to the original README.md.
 
-- **🛡️ User Authentication**: Secure registration, login, and session management.
-- **🔒 Protected Routes**: Access control for authenticated users.
-- **🔎 Product Search & Filtering**: Browse products, apply filters, and sort by category or price.
-- **⭐ Favorites Management**: Save preferred products.
-- **🛍️ Shopping Basket**: Add, view, modify, and remove items.
-- **💳 Checkout Process**:
-  - Secure billing and shipping information handling.
-  - Multiple payment options.
-  - Automatic total price calculation.
+---
 
-## 📸 Screenshots & Demo
+## 🏗️ Infrastructure Overview
 
-![imagen](https://github.com/user-attachments/assets/ea039195-67a2-4bf2-9613-2ee1e666231a)
-![imagen](https://github.com/user-attachments/assets/a87e5c50-5a9e-45b8-ad16-2dbff41acd00)
-![imagen](https://github.com/user-attachments/assets/589aae62-67ef-4496-bd3b-772cd32ca386)
-![imagen](https://github.com/user-attachments/assets/2772b85e-81f7-446a-9296-4fdc2b652cb7)
+This modularized Terraform configuration provisions the infrastructure for a grocery web application using AWS. 
+The setup includes:
+* An auto-scalable high-available Multi-AZ EC2 environment running Dockerized applications.
+* A secure PostgreSQL database on RDS with Failover Replica in private subnets.
+* A Multi_AZ Application Load Balancer for traffic distribution.
+* An S3 bucket for storing user avatars and database dumps.
 
-https://github.com/user-attachments/assets/d1c5c8e4-5b16-486a-b709-4cf6e6cce6bc
-
-## 📋 Prerequisites
-
-Ensure the following dependencies are installed before running the application:
-
-- **🐍 Python (>=3.11)**
-- **🐘 PostgreSQL** – Database for storing product and user information.
-- **🛠️ Git** – Version control system.
-
-## ⚙️ Installation
-
-### 🔹 Clone Repository
-
-```sh
-git clone --branch version2 https://github.com/AlejandroRomanIbanez/AWS_grocery.git && cd AWS_grocery
-```
-
-### 🔹 Configure PostgreSQL
-
-Before creating the database user, you can choose a custom username and password to enhance security. Replace `<your_secure_password>` with a strong password of your choice in the following commands.
-
-Create database and user:
-
-```sh
-psql -U postgres -c "CREATE DATABASE grocerymate_db;"
-psql -U postgres -c "CREATE USER grocery_user WITH ENCRYPTED PASSWORD '<your_secure_password>';"  # Replace <your_secure_password> with a strong password of your choice
-psql -U postgres -c "ALTER USER grocery_user WITH SUPERUSER;"
-```
-
-### 🔹 Populate Database
-
-```sh
-psql -U grocery_user -d grocerymate_db -f backend/app/sqlite_dump_clean.sql
-```
-
-Verify insertion:
-
-```sh
-psql -U grocery_user -d grocerymate_db -c "SELECT * FROM users;"
-psql -U grocery_user -d grocerymate_db -c "SELECT * FROM products;"
-```
-
-### 🔹 Set Up Python Environment
+The infrastructure is designed for high availability, scalability, and security.
 
 
-Install dependencies in an activated virtual Enviroment:
+---
 
-```sh
-cd backend
-pip install -r requirements.txt
-```
-OR (if pip doesn't exist)
-```sh
-pip3 install -r requirements.txt
-```
+## 🧩 Architecture & Diagrams
 
-### 🔹 Set Environment Variables
+> 📷 Add here your architecture diagram (VPC, subnets, services flow, etc.)
 
-Create a `.env` file:
+---
 
-```sh
-touch .env  # macOS/Linux
-ni .env -Force  # Windows
-```
+## ⚙️ Terraform Configuration
 
-Generate a secure JWT key:
+Infrastructure as Code (IaC) is implemented using **Terraform** for declarative, scalable deployments.  
+GitHub Actions automate the CI/CD pipeline for infrastructure provisioning.
 
-```sh
-python3 -c "import secrets; print(secrets.token_hex(32))"
-```
+Here is the structure of the Terraform project:
 
-Update `.env`:
+![Terraform Project Structure](./terraform_structure.png)
 
-```sh
-nano .env
-```
+---
 
-Fill in the following information (make sure to replace the placeholders):
+## 🏢 Infrastructure Components
 
-```ini
-JWT_SECRET_KEY=<your_generated_key>
-POSTGRES_USER=grocery_user
-POSTGRES_PASSWORD=<your_password>
-POSTGRES_DB=grocerymate_db
-POSTGRES_HOST=localhost
-POSTGRES_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
-```
+### 🔒 Security Groups
+Configuration of security rules for EC2 instances, ALB, and RDS.
 
-### 🔹 Start the Application
+### ☁️ Virtual Private Cloud (VPC)
+Network isolation with public and private subnets across multiple availability zones.
 
-```sh
-python3 run.py
-```
+### 🌐 Application Load Balancer (ALB)
+Traffic distribution across auto-scaled EC2 instances.
 
-## 📖 Usage
+### 🖥️ Compute Infrastructure (EC2 & Auto Scaling Group)
+Auto-scalable EC2 setup for high availability and resilience.
 
-- Access the application at [http://localhost:5000](http://localhost:5000)
-- Register/Login to your account
-- Browse and search for products
-- Manage favorites and shopping basket
-- Proceed through the checkout process
+### 📦 Container Registry (ECR)
+Docker container storage for application images.
+
+### 🛢️ Database (Amazon RDS - PostgreSQL)
+Managed relational database service for reliable data storage.
+
+### 🗄️ Storage (S3 Bucket)
+Static file hosting and backup storage.
+
+### 🛡️ IAM Roles & Policies
+Role-based access control to AWS resources with least-privilege permissions.
+
+### 🔄 Lambda Function & Step Functions
+Serverless functions for asynchronous workflows.
+
+---
+
+## 🧮 Variables
+
+All configurations are parameterized using `variables.tf` for flexibility and environment-specific deployments.
+
+---
+
+## 🛠️ Terraform Execution Flow
+
+1. Initialize Terraform: `terraform init`
+2. Validate configuration: `terraform validate`
+3. Plan deployment: `terraform plan`
+4. Apply deployment: `terraform apply`
+
+---
+
+## 📝 Notes
+
+- Ensure your AWS credentials are properly configured before running Terraform.
+- The infrastructure follows the **well-architected framework** best practices.
 
 ## 🤝 Contributing
 
