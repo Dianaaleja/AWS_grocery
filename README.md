@@ -79,8 +79,18 @@ Here is the structure of the Terraform project:
 ### 🔒 Security Groups
 Configuration of security rules for EC2 instances, ALB, and RDS.
 
+* ALB security group allows ports 80 and 443.
+* EC2 security group allows SSH from a specific IP and ALB traffic over port 5000.
+* RDS security group allows access only from EC2 instances.
+* Lambda security allows outbound connection to RDS instance
+
 ### ☁️ Virtual Private Cloud (VPC)
 Network isolation with public and private subnets across multiple availability zones.
+
+* Subnets: 3 Public (for ALB, EC2) & 3 Private (for RDS).
+* Internet Gateway: Provides internet access to public subnets.
+* Route Table: Configured for public subnets routing.
+* VPC Endpoint Gateway: Provides access to S3 bucket over AWS network.
 
 ### 🌐 Application Load Balancer (ALB)
 Traffic distribution across auto-scaled EC2 instances.
@@ -88,26 +98,87 @@ Traffic distribution across auto-scaled EC2 instances.
 ### 🖥️ Compute Infrastructure (EC2 & Auto Scaling Group)
 Auto-scalable EC2 setup for high availability and resilience.
 
+* Auto Scaling Group (ASG):
+  * Uses a Launch Template with user_data for EC2 configuration.
+  * Deploys EC2 instances in public subnets.
+  * Scaling Settings(adjustable as needed):
+* Docker Deployment:  🐳
+  * EC2 instances pull docker image from ECR.
+  * Container start automatically.
+
 ### 📦 Container Registry (ECR)
-Docker container storage for application images.
+
+* Stores the Docker image of the application.
+* EC2 instances pull the latest image during launching from the template.
 
 ### 🛢️ Database (Amazon RDS - PostgreSQL)
 Managed relational database service for reliable data storage.
 
+* Instance Type: db.t3.micro (free-tier eligible).
+* Multi-AZ Deployment: Enabled.
+* Security: Deployed in a private subnet with restricted access.
+
 ### 🗄️ Storage (S3 Bucket)
 Static file hosting and backup storage.
+
+* Purpose: Stores user avatar images, db_dump and layer files
+* Configuration:
+  * Bucket Name: Set via Terraform variables. 
+  * Versioning: Disabled. 
+  * Lifecycle Policy: Disabled. 
+  * Public Access Control:
+    * Block Public ACLs: Disabled. 
+    * Block Public Policy: Disabled. 
+  * Preloaded Avatar: ```user_default.png``` is uploaded. 
+  * Preloaded db_dump file: ```sqlite_dump_clean.sql``` is uploaded 
+  * Preloaded lambda_layer file: ```boto3-psycopg2-layer.zip``` is uploaded
 
 ### 🛡️ IAM Roles & Policies
 Role-based access control to AWS resources with least-privilege permissions.
 
+* EC2 Role: Allows pulling images from ECR and accessing S3.
+* Lambda Role: Allows accessing S3, describing RDS, managing network.
+* Step Functions Role: Grants permissions to interact with RDS, S3, and Lambda.
+* S3 Role: Allows EC2 to access 'avatar' folder and Lambda 'db_dump' folder
+
+
 ### 🔄 Lambda Function & Step Functions
 Serverless functions for asynchronous workflows.
+
+* Purpose: Ensures the database is populated once the infrastructure is ready.
+* Step Functions:
+  * Monitors RDS availability. 
+  * Waits for the database dump file to be uploaded to S3. 
+  * Triggers the Lambda function when conditions are met.
+* Lambda Function:
+  * Retrieves the SQL dump file from S3. 
+  * Connects to RDS. 
+  * Executes the SQL commands to populate the database.
+* CloudWatch Logs:
+  * Logs execution of Step Functions and Lambda. 
+  * Enables debugging of potential issues.
+*EventBridge Trigger:
+  * Detects new database dump uploads in S3 Bucket and triggers Step Functions.
 
 ---
 
 ## 🧮 Variables
 
 All configurations are parameterized using `variables.tf` for flexibility and environment-specific deployments.
+
+The following variables are defined in the `variables.tf` file:
+
+| Variable        | Description                          | Type   | Default           |
+|-----------------|--------------------------------------|--------|-------------------|
+| `instance_name` | Name of the EC2 instance             | string | —                 |
+| `instance_type` | EC2 instance type                    | string | `t2.micro`        |
+| `key_pair_name` | Name of the existing AWS Key Pair    | string | —                 |
+| `aws_region`    | AWS region to deploy resources       | string | —                 |
+| `profile`       | AWS named CLI profile                | string | —                 |
+| `ami`           | AMI ID to use for the EC2 instance   | string | `ami-02b7d5b1e55a7b5f1` |
+| `my_ip`         | Your public IP address in CIDR notation | string | —                 |
+
+> ℹ️ **Note:** Variables with no default are required to be provided via `terraform.tfvars` or the CLI.
 
 ---
 
@@ -117,7 +188,7 @@ All configurations are parameterized using `variables.tf` for flexibility and en
 2. Validate configuration: `terraform validate`
 3. Plan deployment: `terraform plan`
 4. Apply deployment: `terraform apply`
-
+5. Destroy the infrastructure (if needed) : `terraform destroy -auto-approve`
 ---
 
 ## 📝 Notes
