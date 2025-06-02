@@ -59,7 +59,7 @@ The infrastructure is designed for high availability, scalability, and security.
 
 ## 🧩 Architecture & Diagrams
 
-> 📷 Add here your architecture diagram (VPC, subnets, services flow, etc.)
+<img src="./arquitectura.png" alt="AWS Architecture Diagram" width="700"/>
 
 ---
 
@@ -70,8 +70,28 @@ GitHub Actions automate the CI/CD pipeline for infrastructure provisioning.
 
 Here is the structure of the Terraform project:
 
-![Terraform Project Structure](./terraform_structure.png)
-
+``` /bootstrap
+├── main.tf
+├── variables.tf
+/infrastructure
+├── modules
+│ ├── alb
+│ ├── asg
+│ ├── ec2_launch_template
+│ ├── iam_ec2
+│ ├── iam_lambda
+│ ├── lambda
+│ ├── rds
+│ ├── s3_bucket
+│ ├── security_groups
+│ └── vpc
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── terraform.tfvars
+├── lambda_data
+└── generate_backend.py
+```
 ---
 
 ## 🏢 Infrastructure Components
