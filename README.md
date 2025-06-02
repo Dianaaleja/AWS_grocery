@@ -188,18 +188,25 @@ All configurations are parameterized using `variables.tf` for flexibility and en
 
 The following variables are defined in the `variables.tf` file:
 
-| Variable        | Description                          | Type   | Default           |
-|-----------------|--------------------------------------|--------|-------------------|
-| `instance_name` | Name of the EC2 instance             | string | —                 |
-| `instance_type` | EC2 instance type                    | string | `t2.micro`        |
-| `key_pair_name` | Name of the existing AWS Key Pair    | string | —                 |
-| `aws_region`    | AWS region to deploy resources       | string | —                 |
-| `profile`       | AWS named CLI profile                | string | —                 |
+| Variable        | Description                          | Type   | Default             |
+|-----------------|--------------------------------------|--------|---------------------|
+| `instance_name` | Name of the EC2 instance             | string | `MarketMate`        |
+| `instance_type` | EC2 instance type                    | string | `t2.micro`          |
+| `key_pair_name` | Name of the existing AWS Key Pair    | string | `grocery-key`       |
+| `aws_region`    | AWS region to deploy resources       | string | `eu-central-1`      |
+| `profile`       | AWS named CLI profile                | string | —                   |
 | `ami`           | AMI ID to use for the EC2 instance   | string | `ami-02b7d5b1e55a7b5f1` |
-| `my_ip`         | Your public IP address in CIDR notation | string | —                 |
+| `my_ip`         | Your public IP address in CIDR notation | string | —                   |
 
-> ℹ️ **Note:** Variables with no default are required to be provided via `terraform.tfvars` or the CLI.
+> ℹ️ **Note:** The following variables should be defined in a `terraform.tfvars` file or passed via CLI:
 
+```hcl
+vpc_id          = "your-vpc-id"
+subnet          = "your-subnet-id"
+profile_id      = "your-aws-profile"
+ami             = "your-ami-id"
+instance_type   = "t2.micro"
+```
 ---
 
 ## 🛠️ Terraform Execution Flow
