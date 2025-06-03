@@ -61,6 +61,11 @@ The infrastructure is designed for high availability, scalability, and security.
 
 <img src="./arquitectura.png" alt="AWS Architecture Diagram" width="700"/>
 
+<p align="center">
+    <img src="./arquitectura.png" alt="AWS Architecture Diagram" width="700"/>
+</p> 
+
+<p align="center"><i>High-availability and scalable AWS infrastructure for MarketMate application</i></p>
 ---
 
 ## ⚙️ Terraform Configuration
@@ -235,6 +240,8 @@ We welcome contributions! Please follow these steps:
 ## 📜 License
 
 This project is licensed under the MIT License.
+
+
 
 
 
