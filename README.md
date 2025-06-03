@@ -1,7 +1,7 @@
 # 🛒 AWS Grocery App Deployment Guide using Terraform
 
 Welcome! This repository contains the infrastructure deployment guide for **GroceryMate**, a cloud-native e-commerce platform for online grocery shopping.  
-Built as part of the **Masterschool Data Science Bootcamp** — Cloud Engineering Track.
+Built as part of the **Masterschool Data Analysis - Data Science Bootcamp** — Cloud Engineering Track.
 
 Our goal: **Fully automated AWS infrastructure deployment** using **Terraform** and **GitHub Actions**.
 
