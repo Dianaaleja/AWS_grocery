@@ -59,10 +59,8 @@ The infrastructure is designed for high availability, scalability, and security.
 
 ## 🧩 Architecture & Diagrams
 
-<img src="./arquitectura.png" alt="AWS Architecture Diagram" width="700"/>
-
 <p align="center">
-    <img src="./arquitectura.png" alt="AWS Architecture Diagram" width="700"/>
+    <img src="./arquitectura_final.png" alt="AWS Architecture Diagram" width="700"/>
 </p> 
 
 <p align="center"><i>High-availability and scalable AWS infrastructure for MarketMate application</i></p>
